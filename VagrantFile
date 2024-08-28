@@ -1,0 +1,26 @@
+Vagrant.configure("2") do |config|
+  #Job 1 - configurações da Máquina Virtual - Operating System
+  config.vm.box = "kalilinux/rolling"
+  config.vm.hostname = "kali-pc" 
+
+  #Job 2 - configurações da Máquina Virtual - Hardware 
+  config.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = 1
+  config.vm.network "private_network", type: "dhcp"
+
+  end
+
+  #Job 3 - configurações da Máquina Virtual - Software 
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update && apt-get install -y vim git wget xrdp tightvncserver xfce4 xfce4-goodies
+    systemctl restart xrdp
+    cp ~/.vnc/xstartup ~/.vnc/xstartup.bak
+    echo "#!/bin/bash
+    xrdb $HOME/.Xresources
+    startxfce4 &
+    " >> ~/.vnc/xstartup
+    chmod +x ~/.vnc/xstartup
+    vncserver
+  SHELL
+end
